@@ -1,0 +1,20 @@
+[Unit]
+Description=Route53 Dynamic DNS Updater
+After=network.target
+
+[Service]
+# Update the Hosted Zone ID and hostname below
+ExecStart=/usr/local/bin/r53-dyndns \
+    --hosted-zone-id Z081932343XEULDET1H8 \
+    --hostname homelab.danmanners.com
+KillMode=process
+Restart=on-failure
+# You'll want to set your user/group to the
+# appropriate user that has the AWS creds
+# located at ~/.aws/credentials
+User=dan
+Group=dan
+
+[Install]
+Alias=r53-dyndns.service
+WantedBy=multi-user.target
