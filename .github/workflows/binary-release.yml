@@ -1,6 +1,7 @@
 name: Release r53-dyndns binaries
 
 on:
+  workflow_dispatch: 
   release:
     types: [published]
 
