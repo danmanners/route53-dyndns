@@ -1,4 +1,4 @@
-name: Release TBB binaries
+name: Release r53-dyndns binaries
 
 on:
   release:
@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # build and publish in parallel: linux/amd64
+        # build and publish in parallel: linux/amd64,arm64 and darwin/amd64,arm64
         goos: 
           - linux
           - darwin
@@ -19,11 +19,7 @@ jobs:
           - amd64
           - arm64
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Run tests
-        run: go test -v -p=1 -timeout=0 ./...
-
+      - uses: actions/checkout@v3
       - uses: wangyoucao577/go-release-action@v1.33
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
