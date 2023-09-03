@@ -16,14 +16,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/route53"
 )
 
-// Check if environment variables are set; otherwise set a sane default
-func getEnv(key, fallback string) string {
-	if value, ok := os.LookupEnv(key); ok {
-		return value
-	}
-	return fallback
-}
-
 func main() {
 	sess := session.Must(session.NewSession())
 	r53 := route53.New(sess)
@@ -35,6 +27,12 @@ func main() {
 	ttl := flag.Int64("ttl", 300, "TTL for the record.")
 	ipFetchHost := flag.String("ip-fetch-host", "http://icanhazip.com", "Host to fetch the public IP from.")
 	flag.Parse()
+
+	// Confirm that the hostedZoneId and hostname are set
+	if *hostedZoneId == "" || *hostname == "" {
+		fmt.Println("hostedZoneId and hostname must be set. Exiting.")
+		os.Exit(1)
+	}
 
 	// Post parsing, set the checkInterval timing correctly
 	checkInterval := time.Duration(*timeCheck) * time.Second
@@ -58,7 +56,8 @@ func main() {
 			}
 		} else if err != nil {
 			fmt.Println(err)
-			continue
+			break
+
 		}
 
 		if publicIP != currentIP {
@@ -146,6 +145,7 @@ func updateRecord(r53 *route53.Route53, hostname, hostedZoneId string, publicIp 
 	}
 
 	_, err := r53.ChangeResourceRecordSets(input)
+
 	if err != nil {
 		return err
 	}
@@ -163,7 +163,7 @@ func createRecord(r53 *route53.Route53, hostname string, hostedZoneId string, va
 	_, err := getCurrentRecordValue(r53, hostedZoneId, hostname)
 	if err == nil {
 		// If the record already exists, return an error.
-		return fmt.Errorf("A record for hostname %s already exists", hostname)
+		return fmt.Errorf("'A record' for hostname %s already exists", hostname)
 	}
 
 	// Create an A record for the specified hostname with the given value and TTL.
