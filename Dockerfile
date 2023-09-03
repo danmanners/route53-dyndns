@@ -7,7 +7,8 @@ RUN mkdir -p /app \
     && chown -R appuser /app
 
 # Install and run UPX
-RUN apk add --no-cache upx
+RUN apk add --no-cache upx ca-certificates
+
 
 # Switch to the appuser
 USER appuser
@@ -31,6 +32,9 @@ COPY --from=builder /etc/passwd /etc/passwd
 
 # Copy the /etc/group file from the previous stage
 COPY --from=builder /etc/group /etc/group
+
+# Copy the SSL Certificates from the previous stage
+COPY --from=builder /etc/ssl/certs/ /etc/ssl/certs/
 
 # Set the User ID for the container
 USER 10001
